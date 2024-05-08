@@ -37,18 +37,7 @@
 /* USER CODE BEGIN PD */
 #define KEY_NUM 8
 
-KEY_MAP key_map[8] = {
-    {0x59},
-    {0x5A},
-    {0x5B},
-    {0x5C},
-    {0x5D},
-    {0x5E},
-    {0x5F},
-    {0x60},
-};
 
-KEY_typedef KEY_8[KEY_NUM];
 
 /* USER CODE END PD */
 
@@ -74,11 +63,22 @@ void SystemClock_Config(void);
 // char msg[] = "Hello World!\n";
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
-
-
-
 keyboardHID_t keyboardHID = {0, 0, 0, 0, 0, 0, 0, 0};
-keyboardHID_t keyboardHID2 = {0, 0, 0, 0, 0, 0, 0, 0};
+
+KEY_MAP key_map[8] = {
+    {0x59}, // 1
+    {0x5A}, // 2
+    {0x5B}, // 3
+    {0x5C}, // 4
+    {0x5D}, // 5
+    {0x5E}, // 6
+    {0x5F}, // 7
+    {0x60}, // 8
+};
+
+KEY_typedef KEY_8[KEY_NUM];
+
+
 
 uint8_t data[8];
 
@@ -151,7 +151,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
-    read_HC165s(data, 8);
+    read_HC165s(data, 1);
     KEY_READ(&data, 8, &key_map, &KEY_8);
 
     
