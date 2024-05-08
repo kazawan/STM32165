@@ -75,24 +75,14 @@ void SystemClock_Config(void);
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
-typedef struct
-{
-  uint8_t MODIFIER;
-  uint8_t RESERVED;
-  uint8_t KEYCODE1;
-  uint8_t KEYCODE2;
-  uint8_t KEYCODE3;
-  uint8_t KEYCODE4;
-  uint8_t KEYCODE5;
-  uint8_t KEYCODE6;
-} keyboardHID_t;
+
 
 keyboardHID_t keyboardHID = {0, 0, 0, 0, 0, 0, 0, 0};
 keyboardHID_t keyboardHID2 = {0, 0, 0, 0, 0, 0, 0, 0};
 
 uint8_t data[8];
 
-uint8_t sendBuffer[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
 void key_handler(int i)
 {
  
@@ -113,25 +103,10 @@ void key_handler_release(int i)
   //------------------------------
   remove_buff(KEY_8[i].buffer_index,&keyboardHID);
   USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
+  
 }
 
-void key_scan(uint8_t *data)
-{
-  for (int i = 0; i < 8; i++)
-  {
-    if (data[i] == 0)
-    {
-      continue;
-    }
-    else
-    {
-      if (*data & (1 << i))
-      {
-        // CDC_Transmit_FS(&key_map[i].key, 1);
-      }
-    }
-  }
-}
+
 
 /* USER CODE END 0 */
 
@@ -175,9 +150,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    read_HC165s(data, 8);
     KEY_READ(&data, 8, &key_map, &KEY_8);
 
-    read_HC165s(&data, 8);
+    
   }
   /* USER CODE END 3 */
 }

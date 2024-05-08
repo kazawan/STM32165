@@ -9,7 +9,7 @@ void KEY_INIT(int num, KEY_typedef *key_typedef, KEY_MAP *key_map)
         key_typedef[i].KEY_STATE = idle;
         key_typedef[i].KEY_STATE_LAST = idle;
         key_typedef[i].time = 0;
-        key_typedef[i].debounce_time = 20;
+        key_typedef[i].debounce_time = 30;
         key_typedef[i].buffer_index = -1;
     }
 }
