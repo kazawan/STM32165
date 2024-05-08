@@ -92,7 +92,7 @@ void key_handler(int i)
   if(KEY_8[i].buffer_index != -1)
   {
     key_buffer_insert(KEY_8[i].buffer_index,i,&key_map,&keyboardHID);
-    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
+    // USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
 
   }
 }
@@ -102,7 +102,7 @@ void key_handler_release(int i)
   
   //------------------------------
   remove_buff(KEY_8[i].buffer_index,&keyboardHID);
-  USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
+  // USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
   
 }
 
@@ -150,6 +150,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
     read_HC165s(data, 8);
     KEY_READ(&data, 8, &key_map, &KEY_8);
 
