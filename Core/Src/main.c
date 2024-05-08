@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "usbd_cdc_if.h"
+#include "usbd_hid.h"
 #include "hc165.h"
 #include "key.h"
 /* USER CODE END Includes */
@@ -38,14 +38,14 @@
 #define KEY_NUM 8
 
 KEY_MAP key_map[8] = {
-    {'1'},
-    {'2'},
-    {'3'},
-    {'4'},
-    {'5'},
-    {'6'},
-    {'7'},
-    {'8'},
+    {0x59},
+    {0x5A},
+    {0x5B},
+    {0x5C},
+    {0x5D},
+    {0x5E},
+    {0x5F},
+    {0x60},
 };
 
 KEY_typedef KEY_8[KEY_NUM];
@@ -72,10 +72,47 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // char msg[] = "Hello World!\n";
+
+extern USBD_HandleTypeDef hUsbDeviceFS;
+
+typedef struct
+{
+  uint8_t MODIFIER;
+  uint8_t RESERVED;
+  uint8_t KEYCODE1;
+  uint8_t KEYCODE2;
+  uint8_t KEYCODE3;
+  uint8_t KEYCODE4;
+  uint8_t KEYCODE5;
+  uint8_t KEYCODE6;
+} keyboardHID_t;
+
+keyboardHID_t keyboardHID = {0, 0, 0, 0, 0, 0, 0, 0};
+keyboardHID_t keyboardHID2 = {0, 0, 0, 0, 0, 0, 0, 0};
+
 uint8_t data[8];
+
+uint8_t sendBuffer[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 void key_handler(int i)
 {
-  CDC_Transmit_FS(&key_map[i].key, 1);
+ 
+
+  //--------------------------
+  KEY_8[i].buffer_index = find_buff_emtpy_index(&keyboardHID, 8);
+  if(KEY_8[i].buffer_index != -1)
+  {
+    key_buffer_insert(KEY_8[i].buffer_index,i,&key_map,&keyboardHID);
+    USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
+
+  }
+}
+
+void key_handler_release(int i)
+{
+  
+  //------------------------------
+  remove_buff(KEY_8[i].buffer_index,&keyboardHID);
+  USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
 }
 
 void key_scan(uint8_t *data)
@@ -90,7 +127,7 @@ void key_scan(uint8_t *data)
     {
       if (*data & (1 << i))
       {
-        CDC_Transmit_FS(&key_map[i].key, 1);
+        // CDC_Transmit_FS(&key_map[i].key, 1);
       }
     }
   }
@@ -136,10 +173,11 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    read_HC165s(&data, 8);
-    KEY_READ(&data, 8, &key_map, &KEY_8);
 
     /* USER CODE BEGIN 3 */
+    KEY_READ(&data, 8, &key_map, &KEY_8);
+
+    read_HC165s(&data, 8);
   }
   /* USER CODE END 3 */
 }

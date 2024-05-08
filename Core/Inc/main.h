@@ -65,7 +65,7 @@ void Error_Handler(void);
 #define DATA_GPIO_Port GPIOB
 #define LATCH_Pin GPIO_PIN_15
 #define LATCH_GPIO_Port GPIOB
-#define HC165_port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
