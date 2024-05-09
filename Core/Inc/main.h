@@ -54,7 +54,7 @@ extern "C"
   void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+#define _weak_ __attribute__((weak))
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

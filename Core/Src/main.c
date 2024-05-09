@@ -24,8 +24,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usbd_hid.h"
-#include "hc165.h"
-#include "key.h"
+// #include "hc165.h"
+// #include "key.h"
+#include "hc165_driver.h"
+#include "keyboard.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,6 +37,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 #define KEY_NUM 8
 
 
@@ -60,7 +63,17 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-// char msg[] = "Hello World!\n";
+
+HC165_typedef HC165 = {
+  .LATCH = LATCH_Pin,
+  .CLK = CLK_Pin,
+  .DATA = DATA_Pin,
+  .LATCH_PORT = LATCH_GPIO_Port,
+  .CLK_PORT = CLK_GPIO_Port,
+  .DATA_PORT = DATA_GPIO_Port,
+  .keys_number_total = KEY_NUM,
+};
+
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 keyboardHID_t keyboardHID = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -78,32 +91,28 @@ KEY_MAP key_map[8] = {
 
 KEY_typedef KEY_8[KEY_NUM];
 
+void HC165_data_handler(int i, int key_state)
+{
+  key_process(i, key_state, &KEY_8);
+}
 
 
-uint8_t data[8];
+
 
 
 void key_handler(int i)
 {
- 
-
-  //--------------------------
   KEY_8[i].buffer_index = find_buff_emtpy_index(&keyboardHID, 8);
   if(KEY_8[i].buffer_index != -1)
   {
     key_buffer_insert(KEY_8[i].buffer_index,i,&key_map,&keyboardHID);
-    // USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
-
   }
 }
 
 void key_handler_release(int i)
 {
-  
-  //------------------------------
   remove_buff(KEY_8[i].buffer_index,&keyboardHID);
-  // USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
-  
+  KEY_8[i].buffer_index = -1;
 }
 
 
@@ -151,8 +160,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&keyboardHID, sizeof(keyboardHID));
-    read_HC165s(data, 1);
-    KEY_READ(&data, 8, &key_map, &KEY_8);
+    HC165_read(&HC165); 
 
     
   }
